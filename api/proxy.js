@@ -1,9 +1,16 @@
-// api/proxy.js
 export default async function handler(req, res) {
-  // 1. 앱에서 보낸 데이터 받기
-  const { message } = req.body;
+  // 1. 가방(body)이 있는지, 그 안에 message가 있는지 미리 확인!
+  const message = req.body && req.body.message;
 
-  // 2. 환경변수에 숨겨둔 진짜 키 가져오기
+  // 2. 만약 브라우저로 그냥 들어왔거나(GET), 메시지가 없다면 안내문 출력
+  if (!message) {
+    return res.status(200).json({
+      status: "alive",
+      info: "서버는 정상입니다. 앱에서 POST 방식으로 message를 보내주세요!",
+      hint: "브라우저 접속은 GET 방식이라 req.body가 없습니다."
+    });
+  }
+
   const API_KEY = process.env.GROQ_API_KEY;
 
   try {
